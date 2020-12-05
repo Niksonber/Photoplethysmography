@@ -28,14 +28,14 @@ class HaarDetection(ROIDetection):
             faceGray = gray[y:y+h, x:x+w]
             faceColor = im[y:y+h, x:x+w]
             eyes = self.eyeCascade.detectMultiScale(faceGray)
-            for (ex,ey,ew,eh) in eyes:
-                cv2.rectangle(faceColor,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+            # for (ex,ey,ew,eh) in eyes:
+            #     cv2.rectangle(faceColor,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
             
             maxY = max(eyes[0][1], eyes[1][1])
-            roiForehead = faceColor[maxY:maxY-eyes[0][3]][eyes[0][0]+eyes[0][2]//2:eyes[1][0]+eyes[1][2]//2]
+            roiForehead = faceColor[maxY-eyes[0][3]:maxY, eyes[1][0]+eyes[1][2]//2:eyes[0][0]+eyes[0][2]//2]
             cv2.rectangle(faceColor,(eyes[0][0]+eyes[0][2]//2,maxY),(eyes[1][0]+eyes[1][2]//2,maxY-eyes[0][3]),(0,0,255),2)
 
-            roiNose= faceColor[maxY : maxY+eyes[0][3]][eyes[0][0]+eyes[0][2] : eyes[1][0]]
+            roiNose= faceColor[maxY : maxY+eyes[0][3],  eyes[1][0]+eyes[0][2] : eyes[0][0]]
             cv2.rectangle(faceColor,(eyes[0][0],maxY),(eyes[1][0]+eyes[0][2], maxY+eyes[0][3]),(255,0,255),2)
             
             angle = np.arctan2(eyes[0][1]- eyes[1][1], eyes[0][0]- eyes[1][0])
@@ -43,6 +43,10 @@ class HaarDetection(ROIDetection):
             rotated = cv2.warpAffine(im, M, (im.shape[0], im.shape[1])) 
             
             cv2.imshow('img',im)
+            print(roiForehead.shape)
+            cv2.imshow('forehead',roiForehead)
+            cv2.imshow('nose',roiNose)
+
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
